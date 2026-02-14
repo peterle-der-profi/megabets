@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a0f;
+  --color-bg-card: #12121a;
+  --color-bg-card-hover: #1a1a26;
+  --color-border: #1e1e2e;
+  --color-border-active: #2e2e4e;
+  --color-up: #00e676;
+  --color-up-dim: #00e67633;
+  --color-up-glow: #00e67666;
+  --color-down: #ff1744;
+  --color-down-dim: #ff174433;
+  --color-down-glow: #ff174466;
+  --color-accent: #7c4dff;
+  --color-accent-dim: #7c4dff33;
+  --color-text: #e8e8f0;
+  --color-text-dim: #6b6b8a;
+  --color-text-bright: #ffffff;
+  --color-gold: #ffd740;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Glow effects */
+.glow-up { box-shadow: 0 0 20px var(--color-up-glow), 0 0 40px var(--color-up-dim); }
+.glow-down { box-shadow: 0 0 20px var(--color-down-glow), 0 0 40px var(--color-down-dim); }
+.glow-accent { box-shadow: 0 0 20px var(--color-accent-dim); }
+
+/* Animated gradient border */
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.gradient-border {
+  --angle: 0deg;
+  border-image: conic-gradient(from var(--angle), var(--color-up), var(--color-accent), var(--color-down), var(--color-accent), var(--color-up)) 1;
+  animation: rotate-border 3s linear infinite;
+}
+
+@keyframes rotate-border {
+  to { --angle: 360deg; }
+}
+
+/* Pulse animation for live elements */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse-live {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Pool bar animation */
+@keyframes fill-bar {
+  from { width: 0%; }
+}
+
+.animate-fill {
+  animation: fill-bar 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Number ticker */
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ticker-enter {
+  animation: count-up 0.3s ease-out;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-active); border-radius: 3px; }
