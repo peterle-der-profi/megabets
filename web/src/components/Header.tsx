@@ -24,47 +24,55 @@ export function Header() {
     : "0.00";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-xl border-b" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-1.5 group">
-            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shadow-lg shadow-accent/20 group-hover:shadow-accent/40 transition-shadow">
-              <span className="text-white text-xs font-black">M</span>
-            </div>
-            <span className="text-base font-extrabold tracking-tight text-text-bright">
-              MegaBets
-            </span>
-          </Link>
-        </div>
+    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl" style={{
+      background: 'rgba(6,8,15,0.75)',
+      borderBottom: '1px solid rgba(255,255,255,0.03)',
+    }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center relative overflow-hidden" style={{
+            background: 'linear-gradient(135deg, #F7931A 0%, #DC1478 100%)',
+            boxShadow: '0 0 20px rgba(247,147,26,0.3)',
+          }}>
+            <span className="text-white text-sm font-black font-display relative z-10">M</span>
+          </div>
+          <span className="text-lg font-bold tracking-tight text-text-bright font-display">
+            Mega<span className="text-btc">Bets</span>
+          </span>
+        </Link>
 
-        <div className="flex items-center gap-2">
+        {/* Right side */}
+        <div className="flex items-center gap-3">
           {authenticated && address ? (
             <>
               <Link
                 to="/history"
-                className="text-sm text-text-secondary hover:text-text-bright transition-colors font-medium"
+                className="text-sm text-text-secondary hover:text-text-bright transition-colors font-medium font-body hidden sm:block"
               >
                 History
               </Link>
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-bg-secondary">
-                <span className="text-sm font-semibold text-text-bright">{displayBalance}</span>
-                <span className="text-xs text-text-dim">USDM</span>
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <span className="text-sm font-semibold text-text-bright font-mono">{displayBalance}</span>
+                <span className="text-xs text-text-dim font-mono">USDM</span>
               </div>
               <button
                 onClick={logout}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-secondary hover:bg-bg-card-hover transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors hover:bg-white/[0.04]"
+                style={{ background: 'rgba(255,255,255,0.03)' }}
               >
                 <div className="w-2 h-2 rounded-full bg-up" />
-                <span className="text-sm text-text font-mono">{displayAddress}</span>
+                <span className="text-sm text-text-secondary font-mono">{displayAddress}</span>
               </button>
             </>
           ) : (
             <button
               onClick={login}
-              className="px-5 py-2 rounded-lg text-white font-semibold text-sm hover:brightness-110 transition-all"
+              className="px-6 py-2.5 rounded-xl text-white font-bold text-sm font-display uppercase tracking-wide hover:scale-[1.03] hover:brightness-110 transition-all"
               style={{
-                background: 'linear-gradient(135deg, #F7931A 0%, #D35400 100%)',
-                boxShadow: '0 0 20px rgba(247,147,26,0.3), 0 2px 8px rgba(0,0,0,0.3)',
+                background: 'linear-gradient(180deg, #FFA030 0%, #D35400 100%)',
+                boxShadow: '0 0 24px rgba(247,147,26,0.35), 0 4px 16px rgba(0,0,0,0.4)',
+                letterSpacing: '0.05em',
               }}
             >
               Connect Wallet

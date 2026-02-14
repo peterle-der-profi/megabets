@@ -12,7 +12,7 @@ export function Background() {
       "rgba(247,147,26,0.6)",
       "rgba(255,100,20,0.5)",
       "rgba(220,20,120,0.4)",
-      "rgba(167,139,250,0.4)",
+      "rgba(139,92,246,0.4)",
       "rgba(255,200,80,0.3)",
       "rgba(255,60,20,0.4)",
     ];
@@ -38,18 +38,13 @@ export function Background() {
       });
 
       container.appendChild(p);
-
-      setTimeout(() => {
-        p.remove();
-      }, (duration + delay) * 1000);
+      setTimeout(() => { p.remove(); }, (duration + delay) * 1000);
     }
 
-    // Spawn initial batch
     for (let i = 0; i < 15; i++) {
       setTimeout(() => spawnParticle(), i * 200);
     }
 
-    // Keep spawning
     const interval = setInterval(spawnParticle, 800);
     return () => clearInterval(interval);
   }, []);

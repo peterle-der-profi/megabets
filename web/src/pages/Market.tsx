@@ -194,7 +194,7 @@ export default function MarketPage() {
           <div className="flex items-center gap-3">
             <IconComponent size={40} />
             <div>
-              <h1 className="text-2xl font-black text-text-bright tracking-tight">
+              <h1 className="text-2xl font-display font-bold text-text-bright tracking-tight">
                 {asset}/USD <span className={`text-${assetColor} text-lg font-bold`}>· {TIMEFRAME_LABELS[timeframe]}</span>
               </h1>
               <div className="flex items-center gap-2 mt-0.5">
@@ -552,7 +552,7 @@ export default function MarketPage() {
         {/* Participants */}
         {!isFinished && roundBets.length > 0 && (
           <div className="lg:max-w-[66%] mb-4">
-            <div className="rounded-xl bg-bg-card overflow-hidden card-dark">
+            <div className="rounded-xl bg-bg-card overflow-hidden card-glass">
               <div className="px-4 py-2.5 border-b flex items-center justify-between" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
                 <span className="text-[10px] font-bold text-text-bright uppercase" style={{ letterSpacing: "0.08em" }}>
                   Players
