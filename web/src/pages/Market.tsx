@@ -150,7 +150,7 @@ export default function MarketPage() {
   };
 
   const IconComponent = asset === "BTC" ? BtcIcon : EthIcon;
-  const assetColor = asset === "BTC" ? "btc" : "eth";
+  const assetColor = asset === "BTC" ? "#F7931A" : "#8B5CF6";
   const direction = price > prevPrice ? "up" : price < prevPrice ? "down" : "neutral";
   const priceDelta = lockPrice ? price - lockPrice : undefined;
   const totalUp = !isFinished && round ? Number(round.totalUp) / 1e6 : 0;
@@ -163,6 +163,7 @@ export default function MarketPage() {
   const mins = Math.floor(countdown / 60);
   const secs = countdown % 60;
   const isUrgent = countdown > 0 && countdown <= 10;
+  const isCritical = countdown > 0 && countdown <= 5;
 
   const balanceDisplay = usdmBalance !== undefined
     ? Number(formatUnits(usdmBalance as bigint, 6)).toFixed(2)
@@ -171,41 +172,43 @@ export default function MarketPage() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 pt-18 pb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+        {/* Back */}
         <button
           onClick={() => navigate("/")}
-          className="text-text-dim text-[10px] font-mono uppercase tracking-widest hover:text-text-secondary mb-3 flex items-center gap-1 transition-colors"
+          className="text-text-dim text-[10px] font-mono uppercase tracking-widest hover:text-text-secondary mb-4 flex items-center gap-1 transition-colors"
           style={{ letterSpacing: "0.08em" }}
         >
           ← MARKETS
         </button>
 
+        {/* Claimable banner */}
         {claimableRounds.length > 0 && (
           <Link
             to="/history"
-            className="block rounded-xl border border-up/20 bg-up/5 px-4 py-3 mb-3 text-up font-mono text-sm font-bold hover:bg-up/10 transition-colors glow-up"
+            className="block rounded-xl border border-up/20 bg-up/5 px-4 py-3 mb-4 text-up font-mono text-sm font-bold hover:bg-up/10 transition-colors glow-up"
           >
             🎉 You have {claimableRounds.length} unclaimed reward{claimableRounds.length > 1 ? "s" : ""} — Claim now →
           </Link>
         )}
 
-        {/* Header row */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <IconComponent size={40} />
+        {/* Header row: asset + countdown */}
+        <div className="flex items-center justify-between mb-5 anim-fade-up">
+          <div className="flex items-center gap-4">
+            <IconComponent size={48} />
             <div>
-              <h1 className="text-2xl font-display font-bold text-text-bright tracking-tight">
-                {asset}/USD <span className={`text-${assetColor} text-lg font-bold`}>· {TIMEFRAME_LABELS[timeframe]}</span>
+              <h1 className="text-3xl font-black text-text-bright tracking-tight font-display">
+                {asset}/USD <span style={{ color: assetColor }} className="text-xl font-bold">· {TIMEFRAME_LABELS[timeframe]}</span>
               </h1>
-              <div className="flex items-center gap-2 mt-0.5">
+              <div className="flex items-center gap-2 mt-1">
                 {status === RoundStatus.OPEN && (
                   <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-up pulse-live" />
-                    <span className="text-[11px] font-semibold text-up uppercase" style={{ letterSpacing: "0.08em" }}>Betting Open</span>
+                    <div className="w-2 h-2 rounded-full bg-up pulse-live" />
+                    <span className="text-xs font-semibold text-up uppercase font-display" style={{ letterSpacing: "0.08em" }}>Betting Open</span>
                   </div>
                 )}
                 {status === RoundStatus.LOCKED && (
-                  <span className="text-[11px] font-semibold text-accent uppercase" style={{ letterSpacing: "0.08em" }}>Locked</span>
+                  <span className="text-xs font-semibold text-accent uppercase font-display" style={{ letterSpacing: "0.08em" }}>🔒 Locked</span>
                 )}
               </div>
             </div>
@@ -213,10 +216,13 @@ export default function MarketPage() {
 
           {/* Countdown */}
           {countdown > 0 && (
-            <div className={`text-right ${isUrgent ? "pulse-urgent" : ""}`}>
+            <div className={`text-right ${isCritical ? "countdown-pulse-critical" : isUrgent ? "countdown-pulse-fast" : ""}`}>
               <div className={`font-mono font-black tracking-tight ${
-                isUrgent ? "text-down text-5xl" : status === RoundStatus.OPEN ? "text-up text-5xl" : "text-accent text-4xl"
-              }`} style={{ textShadow: isUrgent ? "0 0 20px rgba(239,68,68,0.5)" : status === RoundStatus.OPEN ? "0 0 20px rgba(34,197,94,0.3)" : "none" }}>
+                isCritical ? "text-down" : isUrgent ? "text-btc" : status === RoundStatus.OPEN ? "text-up" : "text-accent"
+              }`} style={{
+                fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+                textShadow: isCritical ? "0 0 30px rgba(255,50,50,0.6)" : isUrgent ? "0 0 20px rgba(247,147,26,0.5)" : status === RoundStatus.OPEN ? "0 0 20px rgba(0,255,106,0.3)" : "none",
+              }}>
                 {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
               </div>
               <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>
@@ -226,18 +232,19 @@ export default function MarketPage() {
           )}
         </div>
 
-        {/* Price info */}
-        <div className="flex items-baseline gap-6 mb-4">
+        {/* HUGE Price */}
+        <div className="flex items-baseline gap-6 mb-5 anim-fade-up anim-delay-1">
           <div>
-            <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Current</div>
-            <div className={`text-5xl font-mono font-black ${direction === "up" ? "text-up" : direction === "down" ? "text-down" : asset === "BTC" ? "text-btc" : "text-eth"}`}>
+            <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Current Price</div>
+            <div className={`font-mono font-black ${direction === "up" ? "text-up" : direction === "down" ? "text-down" : "text-text-bright"}`}
+              style={{ fontSize: 'clamp(3rem, 6vw, 4.5rem)', lineHeight: 1.1 }}>
               ${price > 0 ? price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "—"}
             </div>
           </div>
           {lockPrice !== undefined && (
             <div>
               <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Lock Price</div>
-              <div className="text-xl font-mono font-bold text-accent">
+              <div className="text-2xl font-mono font-bold text-accent">
                 ${lockPrice.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </div>
             </div>
@@ -245,30 +252,30 @@ export default function MarketPage() {
           {priceDelta !== undefined && (
             <div>
               <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Delta</div>
-              <div className={`text-xl font-mono font-bold ${priceDelta >= 0 ? "text-up" : "text-down"}`}>
+              <div className={`text-2xl font-mono font-bold ${priceDelta >= 0 ? "text-up" : "text-down"}`}>
                 {priceDelta >= 0 ? "+" : ""}{priceDelta.toFixed(2)}
               </div>
             </div>
           )}
         </div>
 
-        {/* Timeframe tabs */}
-        <div className="flex items-center gap-1.5 mb-4">
+        {/* Timeframe pills */}
+        <div className="flex items-center gap-1.5 mb-5 anim-fade-up anim-delay-2">
           {TIMEFRAMES.map((tf) => {
             const isActive = timeframe === tf;
-            const glowColor = asset === "BTC" ? "rgba(247,147,26,0.4)" : "rgba(139,92,246,0.4)";
             return (
               <button
                 key={tf}
                 onClick={() => handleTimeframeChange(tf)}
-                className={`
-                  px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all
-                  ${isActive
-                    ? `bg-${assetColor} text-white`
-                    : "bg-bg-card text-text-dim hover:text-text-secondary hover:bg-bg-card-hover"
-                  }
-                `}
-                style={isActive ? { boxShadow: `0 0 16px ${glowColor}, 0 0 4px ${glowColor}` } : {}}
+                className={`px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all font-display ${
+                  isActive ? "text-white" : "text-text-dim hover:text-text-secondary"
+                }`}
+                style={isActive ? {
+                  background: `linear-gradient(135deg, ${assetColor} 0%, ${asset === "BTC" ? "#E91E8B" : "#6366F1"} 100%)`,
+                  boxShadow: `0 0 16px ${assetColor}66`,
+                } : {
+                  background: 'rgba(255,255,255,0.04)',
+                }}
               >
                 {TIMEFRAME_LABELS[tf]}
               </button>
@@ -277,15 +284,15 @@ export default function MarketPage() {
         </div>
 
         {/* Chart + Trade panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4" style={{ alignItems: "stretch" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5 anim-fade-up anim-delay-3" style={{ alignItems: "stretch" }}>
           {/* Chart with gradient border */}
           <div className="lg:col-span-2 flex flex-col">
-            <div className="rounded-xl p-[1px] flex-1"
-              style={{ background: asset === "BTC"
-                ? 'linear-gradient(135deg, rgba(247,147,26,0.4) 0%, rgba(233,30,139,0.2) 50%, rgba(139,92,246,0.1) 100%)'
-                : 'linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(233,30,139,0.2) 50%, rgba(247,147,26,0.1) 100%)'
-              }}>
-              <div className={`rounded-xl bg-bg-card/95 overflow-hidden h-full min-h-[420px]`}>
+            <div className="rounded-xl p-[1px] flex-1" style={{
+              background: asset === "BTC"
+                ? 'linear-gradient(135deg, rgba(247,147,26,0.35) 0%, rgba(233,30,139,0.15) 50%, rgba(139,92,246,0.08) 100%)'
+                : 'linear-gradient(135deg, rgba(139,92,246,0.35) 0%, rgba(233,30,139,0.15) 50%, rgba(247,147,26,0.08) 100%)'
+            }}>
+              <div className="rounded-xl bg-bg-card/95 overflow-hidden h-full min-h-[420px]" style={{ backdropFilter: 'blur(12px)' }}>
                 <SmoothChart
                   prices={priceHistory}
                   lockPrice={lockPrice}
@@ -296,78 +303,70 @@ export default function MarketPage() {
             </div>
           </div>
 
-          {/* Trade panel with gradient border */}
+          {/* Trade panel */}
           <div className="flex flex-col">
-            <div className="rounded-xl p-[1px] flex-1" style={{ background: 'linear-gradient(180deg, rgba(99,102,241,0.3) 0%, rgba(99,102,241,0.05) 100%)' }}>
-            <div className="rounded-xl bg-bg-card/95 overflow-hidden flex-1 flex flex-col">
+            <div className="rounded-xl p-[1px] flex-1" style={{ background: 'linear-gradient(180deg, rgba(99,102,241,0.25) 0%, rgba(99,102,241,0.04) 100%)' }}>
+            <div className="rounded-xl bg-bg-card/95 overflow-hidden flex-1 flex flex-col" style={{ backdropFilter: 'blur(12px)' }}>
               {/* Trade header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
-                <span className="text-xs font-bold text-text-bright uppercase" style={{ letterSpacing: "0.08em" }}>Make your move</span>
+              <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <span className="text-xs font-bold text-text-bright uppercase font-display" style={{ letterSpacing: "0.08em" }}>Make Your Move</span>
                 {status === RoundStatus.OPEN && (
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-up pulse-live" />
-                    <span className="text-[10px] font-bold text-up uppercase" style={{ letterSpacing: "0.08em" }}>Open</span>
+                    <span className="text-[10px] font-bold text-up uppercase font-display" style={{ letterSpacing: "0.08em" }}>Open</span>
                   </div>
                 )}
                 {status === RoundStatus.LOCKED && (
-                  <span className="text-[10px] font-bold text-accent uppercase" style={{ letterSpacing: "0.08em" }}>Locked</span>
+                  <span className="text-[10px] font-bold text-accent uppercase font-display" style={{ letterSpacing: "0.08em" }}>Locked</span>
                 )}
               </div>
 
-              <div className="p-4 space-y-4 flex-1 flex flex-col">
-                {/* HIGHER / LOWER buttons */}
+              <div className="p-5 space-y-4 flex-1 flex flex-col">
+                {/* HIGHER / LOWER */}
                 {(status === RoundStatus.OPEN || status === RoundStatus.NONE) && !hasBet && (
                   <>
                     <div className="space-y-2">
                       <button
                         onClick={() => setSelectedDirection(Direction.UP)}
-                        className={`
-                          w-full py-4 rounded-xl font-bold text-base uppercase tracking-wide transition-all duration-150
-                          ${selectedDirection === Direction.UP
-                            ? "text-white glow-up"
-                            : "text-up hover:scale-[1.03]"
-                          }
-                        `}
+                        className={`w-full py-4 rounded-xl font-black text-base uppercase tracking-wide transition-all duration-150 font-display ${
+                          selectedDirection === Direction.UP ? "text-white glow-up scale-[1.02]" : "text-up hover:scale-[1.02]"
+                        }`}
                         style={{
                           background: selectedDirection === Direction.UP
-                            ? "linear-gradient(135deg, #22C55E 0%, #16A34A 100%)"
-                            : "linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.04) 100%)",
-                          border: `1px solid ${selectedDirection === Direction.UP ? "rgba(34,197,94,0.5)" : "rgba(34,197,94,0.2)"}`,
+                            ? "linear-gradient(135deg, #00FF6A 0%, #00CC55 100%)"
+                            : "linear-gradient(135deg, rgba(0,255,106,0.10) 0%, rgba(0,255,106,0.03) 100%)",
+                          border: `1px solid ${selectedDirection === Direction.UP ? "rgba(0,255,106,0.5)" : "rgba(0,255,106,0.15)"}`,
                         }}
                       >
                         <span className="flex items-center justify-center gap-2">
                           <span>▲</span> HIGHER
-                          {totalPool > 0 && <span className="text-[10px] opacity-70 ml-1">{Math.round(upPct)}%</span>}
+                          {totalPool > 0 && <span className="text-[10px] opacity-70 ml-1 font-mono">{Math.round(upPct)}%</span>}
                         </span>
                       </button>
                       <button
                         onClick={() => setSelectedDirection(Direction.DOWN)}
-                        className={`
-                          w-full py-4 rounded-xl font-bold text-base uppercase tracking-wide transition-all duration-150
-                          ${selectedDirection === Direction.DOWN
-                            ? "text-white glow-down"
-                            : "text-down hover:scale-[1.03]"
-                          }
-                        `}
+                        className={`w-full py-4 rounded-xl font-black text-base uppercase tracking-wide transition-all duration-150 font-display ${
+                          selectedDirection === Direction.DOWN ? "text-white glow-down scale-[1.02]" : "text-down hover:scale-[1.02]"
+                        }`}
                         style={{
                           background: selectedDirection === Direction.DOWN
-                            ? "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)"
-                            : "linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04) 100%)",
-                          border: `1px solid ${selectedDirection === Direction.DOWN ? "rgba(239,68,68,0.5)" : "rgba(239,68,68,0.2)"}`,
+                            ? "linear-gradient(135deg, #FF3B3B 0%, #CC2020 100%)"
+                            : "linear-gradient(135deg, rgba(255,59,59,0.10) 0%, rgba(255,59,59,0.03) 100%)",
+                          border: `1px solid ${selectedDirection === Direction.DOWN ? "rgba(255,59,59,0.5)" : "rgba(255,59,59,0.15)"}`,
                         }}
                       >
                         <span className="flex items-center justify-center gap-2">
                           <span>▼</span> LOWER
-                          {totalPool > 0 && <span className="text-[10px] opacity-70 ml-1">{Math.round(downPct)}%</span>}
+                          {totalPool > 0 && <span className="text-[10px] opacity-70 ml-1 font-mono">{Math.round(downPct)}%</span>}
                         </span>
                       </button>
                     </div>
 
-                    {/* Amount */}
+                    {/* Amount input */}
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Amount</label>
-                        <span className="text-[10px] font-mono text-text-dim">Balance: {balanceDisplay} USDM</span>
+                        <span className="text-[10px] font-mono text-text-dim">Bal: {balanceDisplay} USDM</span>
                       </div>
                       <div className="relative">
                         <input
@@ -375,7 +374,7 @@ export default function MarketPage() {
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                           placeholder="0"
-                          className="w-full px-3 py-3 pr-16 rounded-xl bg-bg border border-border focus:border-accent/50 focus:outline-none font-mono text-xl text-text-bright placeholder-text-dim transition-colors"
+                          className="w-full px-4 py-3 pr-16 rounded-xl bg-bg border border-border focus:border-accent/50 focus:outline-none font-mono text-xl text-text-bright placeholder-text-dim transition-colors"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>
                           USDM
@@ -389,13 +388,11 @@ export default function MarketPage() {
                         <button
                           key={qa}
                           onClick={() => setAmount(qa.toString())}
-                          className={`
-                            py-2 rounded-lg text-xs font-mono font-bold transition-all
-                            ${amount === qa.toString()
+                          className={`py-2 rounded-lg text-xs font-mono font-bold transition-all ${
+                            amount === qa.toString()
                               ? "bg-accent/20 text-accent border border-accent/40 glow-accent"
                               : "bg-bg-secondary border border-border text-text-dim hover:text-text-secondary hover:border-border-active"
-                            }
-                          `}
+                          }`}
                         >
                           {qa}
                         </button>
@@ -418,27 +415,28 @@ export default function MarketPage() {
                       </div>
                     )}
 
-                    {/* CTA */}
+                    {/* Bet CTA */}
                     <button
                       onClick={handleBet}
                       disabled={selectedDirection === null || !amount || Number(amount) <= 0 || isTxPending}
-                      className="w-full py-4 rounded-xl font-bold text-base uppercase tracking-wide transition-all disabled:opacity-20 disabled:cursor-not-allowed hover:scale-[1.02] hover:brightness-110 text-white"
+                      className="w-full py-4 rounded-xl font-black text-lg uppercase tracking-wide transition-all disabled:opacity-20 disabled:cursor-not-allowed hover:scale-[1.02] hover:brightness-110 text-white font-display"
                       style={{
                         background: selectedDirection === Direction.DOWN
-                          ? "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)"
+                          ? "linear-gradient(135deg, #FF3B3B 0%, #B91C1C 100%)"
                           : selectedDirection === Direction.UP
-                            ? "linear-gradient(135deg, #22C55E 0%, #15803D 100%)"
-                            : "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
+                            ? "linear-gradient(135deg, #00FF6A 0%, #00AA44 100%)"
+                            : "linear-gradient(180deg, #FFA030 0%, #D35400 100%)",
                         boxShadow: selectedDirection !== null
-                          ? `0 0 20px ${selectedDirection === Direction.DOWN ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.3)"}`
-                          : "0 0 20px rgba(99,102,241,0.2)",
+                          ? `0 0 24px ${selectedDirection === Direction.DOWN ? "rgba(255,59,59,0.35)" : "rgba(0,255,106,0.35)"}`
+                          : "0 0 20px rgba(247,147,26,0.25)",
+                        letterSpacing: '0.06em',
                       }}
                     >
                       {txStatus === "approving" ? "Approving..."
                         : txStatus === "betting" ? "Placing bet..."
                         : needsApproval ? "Approve & Bet"
-                        : selectedDirection === null ? "Higher or lower?"
-                        : "Make your bet"}
+                        : selectedDirection === null ? "Pick a side"
+                        : "PLACE BET"}
                     </button>
                   </>
                 )}
@@ -450,9 +448,9 @@ export default function MarketPage() {
                       ? "bg-up/8 border border-up/20 glow-up"
                       : "bg-down/8 border border-down/20 glow-down"
                   }`}>
-                    <div className="text-[10px] font-mono text-text-dim uppercase mb-2" style={{ letterSpacing: "0.08em" }}>Your position</div>
+                    <div className="text-[10px] font-mono text-text-dim uppercase mb-2" style={{ letterSpacing: "0.08em" }}>Your Position</div>
                     <div className="flex items-center justify-between">
-                      <span className={`font-bold text-lg ${Number(userBet.direction) === Direction.UP ? "text-up" : "text-down"}`}>
+                      <span className={`font-black text-lg font-display ${Number(userBet.direction) === Direction.UP ? "text-up" : "text-down"}`}>
                         {Number(userBet.direction) === Direction.UP ? "▲ HIGHER" : "▼ LOWER"}
                       </span>
                       <span className="font-mono font-bold text-text-bright text-lg">
@@ -467,7 +465,7 @@ export default function MarketPage() {
                   <button
                     onClick={handleClaim}
                     disabled={isTxPending}
-                    className="w-full py-4 rounded-xl font-bold text-base uppercase tracking-wide transition-all disabled:opacity-40 text-white hover:scale-[1.02]"
+                    className="w-full py-4 rounded-xl font-black text-base uppercase tracking-wide transition-all disabled:opacity-40 text-white hover:scale-[1.02] font-display"
                     style={{
                       background: status === RoundStatus.RESOLVED
                         ? "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)"
@@ -478,8 +476,8 @@ export default function MarketPage() {
                     }}
                   >
                     {txStatus === "claiming" ? "Claiming..."
-                      : status === RoundStatus.RESOLVED ? "🎉 Claim winnings"
-                      : "Claim refund"}
+                      : status === RoundStatus.RESOLVED ? "🎉 Claim Winnings"
+                      : "Claim Refund"}
                   </button>
                 )}
 
@@ -490,7 +488,7 @@ export default function MarketPage() {
                       initial={{ opacity: 0, y: 4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className={`text-center text-xs font-bold uppercase py-2.5 rounded-xl ${
+                      className={`text-center text-xs font-bold uppercase py-2.5 rounded-xl font-display ${
                         txStatus === "success" ? "text-up bg-up/10 border border-up/20" : "text-down bg-down/10 border border-down/20"
                       }`}
                       style={{ letterSpacing: "0.08em" }}
@@ -502,21 +500,23 @@ export default function MarketPage() {
 
                 {/* Pool distribution */}
                 {totalPool > 0 && (
-                  <div className="space-y-2 pt-3 border-t mt-auto" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
+                  <div className="space-y-2 pt-3 mt-auto" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
                     <div className="text-[10px] font-mono text-text-dim uppercase" style={{ letterSpacing: "0.08em" }}>Pool</div>
                     <div className="flex justify-between text-[11px] font-mono">
                       <span className="text-up font-bold">▲ {totalUp.toFixed(0)}</span>
                       <span className="text-text-dim">{totalPool.toFixed(0)} USDM</span>
                       <span className="text-down font-bold">{totalDown.toFixed(0)} ▼</span>
                     </div>
-                    <div className="relative h-1.5 rounded-full overflow-hidden bg-bg">
+                    <div className="relative h-2 rounded-full overflow-hidden bg-bg">
                       <motion.div
-                        className="absolute inset-y-0 left-0 rounded-full bg-up"
+                        className="absolute inset-y-0 left-0 rounded-full"
+                        style={{ background: 'linear-gradient(90deg, #00FF6A, #00CC55)' }}
                         animate={{ width: `${upPct}%` }}
                         transition={{ duration: 0.5 }}
                       />
                       <motion.div
-                        className="absolute inset-y-0 right-0 rounded-full bg-down"
+                        className="absolute inset-y-0 right-0 rounded-full"
+                        style={{ background: 'linear-gradient(90deg, #CC2020, #FF3B3B)' }}
                         animate={{ width: `${downPct}%` }}
                         transition={{ duration: 0.5 }}
                       />
@@ -533,7 +533,7 @@ export default function MarketPage() {
                   <div className={`p-4 rounded-xl text-center ${
                     round.closePrice > round.lockPrice ? "bg-up/8 border border-up/20" : "bg-down/8 border border-down/20"
                   }`}>
-                    <span className={`font-black text-xl ${
+                    <span className={`font-black text-xl font-display ${
                       round.closePrice > round.lockPrice ? "text-up" : "text-down"
                     }`}>
                       {round.closePrice > round.lockPrice ? "▲ HIGHER WINS" : "▼ LOWER WINS"}
@@ -551,23 +551,23 @@ export default function MarketPage() {
 
         {/* Participants */}
         {!isFinished && roundBets.length > 0 && (
-          <div className="lg:max-w-[66%] mb-4">
-            <div className="rounded-xl bg-bg-card overflow-hidden card-glass">
-              <div className="px-4 py-2.5 border-b flex items-center justify-between" style={{ borderColor: 'rgba(255,255,255,0.03)' }}>
-                <span className="text-[10px] font-bold text-text-bright uppercase" style={{ letterSpacing: "0.08em" }}>
-                  Players
-                </span>
-                <span className="text-[10px] font-mono text-text-dim">
-                  {roundBets.length} in round
-                </span>
+          <div className="lg:max-w-[66%] mb-4 anim-fade-up anim-delay-4">
+            <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(12,16,32,0.7)', backdropFilter: 'blur(12px)' }}>
+              <div className="px-5 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-text-bright uppercase font-display" style={{ letterSpacing: "0.08em" }}>
+                    Players
+                  </span>
+                  <span className="text-[10px] font-mono text-text-dim">
+                    {roundBets.length} in round
+                  </span>
+                </div>
               </div>
               <div className="divide-y divide-white/[0.03]">
                 {roundBets.map((bet) => (
-                  <div key={bet.id} className="px-4 py-2.5 flex items-center justify-between">
+                  <div key={bet.id} className="px-5 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className={`font-mono text-xs font-bold ${
-                        bet.direction === 0 ? "text-up" : "text-down"
-                      }`}>
+                      <span className={`font-mono text-xs font-bold ${bet.direction === 0 ? "text-up" : "text-down"}`}>
                         {bet.direction === 0 ? "▲" : "▼"}
                       </span>
                       <span className="font-mono text-xs text-text-dim">

@@ -89,14 +89,15 @@ export default function History() {
     return (
       <div className="min-h-screen">
         <Header />
-        <main className="max-w-4xl mx-auto px-4 pt-24 text-center">
-          <h1 className="text-3xl font-black text-text-bright mb-2">Bet History</h1>
-          <p className="text-text-dim mb-6">Connect your wallet to view your bet history.</p>
+        <main className="max-w-4xl mx-auto px-4 pt-28 text-center">
+          <h1 className="text-4xl font-black text-text-bright mb-3 font-display">Bet History</h1>
+          <p className="text-text-dim mb-8 font-body text-lg">Connect your wallet to view your history.</p>
           <button onClick={login}
-            className="px-8 py-3 rounded-xl text-white font-bold text-sm uppercase hover:scale-[1.02] transition-all"
+            className="px-10 py-4 rounded-xl text-white font-black text-base uppercase hover:scale-[1.03] transition-all font-display"
             style={{
-              background: 'linear-gradient(135deg, #F7931A 0%, #D35400 100%)',
-              boxShadow: '0 0 20px rgba(247,147,26,0.3), 0 4px 16px rgba(0,0,0,0.4)',
+              background: 'linear-gradient(180deg, #FFA030 0%, #D35400 100%)',
+              boxShadow: '0 0 30px rgba(247,147,26,0.35), 0 4px 16px rgba(0,0,0,0.4)',
+              letterSpacing: '0.06em',
             }}>
             Connect Wallet
           </button>
@@ -108,61 +109,63 @@ export default function History() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="max-w-5xl mx-auto px-4 pt-20 pb-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-22 pb-16">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-black text-text-bright">Your History</h1>
+        <div className="flex items-center justify-between mb-8 anim-fade-up">
+          <h1 className="text-3xl font-black text-text-bright font-display">Your History</h1>
           <Link to="/" className="text-[10px] font-mono uppercase tracking-widest text-text-dim hover:text-text-bright transition-colors">
             ← Markets
           </Link>
         </div>
 
         {/* Stats cards with gradient borders */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 anim-fade-up anim-delay-1">
           {[
-            { label: "Total Bets", value: totalBets.toString(), gradient: "linear-gradient(135deg, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0.1) 100%)" },
-            { label: "Wagered", value: `$${totalWagered.toFixed(2)}`, gradient: "linear-gradient(135deg, rgba(247,147,26,0.4) 0%, rgba(247,147,26,0.1) 100%)" },
-            { label: "Win Rate", value: `${winRate}%`, gradient: "linear-gradient(135deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 100%)" },
-            { label: "Net P&L", value: `${netPnL >= 0 ? "+" : ""}$${netPnL.toFixed(2)}`, color: netPnL >= 0 ? "text-up" : "text-down", gradient: netPnL >= 0 ? "linear-gradient(135deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 100%)" : "linear-gradient(135deg, rgba(239,68,68,0.4) 0%, rgba(239,68,68,0.1) 100%)" },
+            { label: "Total Bets", value: totalBets.toString(), gradient: "linear-gradient(135deg, rgba(99,102,241,0.4) 0%, rgba(99,102,241,0.08) 100%)" },
+            { label: "Wagered", value: `$${totalWagered.toFixed(2)}`, gradient: "linear-gradient(135deg, rgba(247,147,26,0.4) 0%, rgba(247,147,26,0.08) 100%)" },
+            { label: "Win Rate", value: `${winRate}%`, gradient: "linear-gradient(135deg, rgba(0,255,106,0.4) 0%, rgba(0,255,106,0.08) 100%)" },
+            { label: "Net P&L", value: `${netPnL >= 0 ? "+" : ""}$${netPnL.toFixed(2)}`, color: netPnL >= 0 ? "text-up" : "text-down", gradient: netPnL >= 0 ? "linear-gradient(135deg, rgba(0,255,106,0.4) 0%, rgba(0,255,106,0.08) 100%)" : "linear-gradient(135deg, rgba(255,59,59,0.4) 0%, rgba(255,59,59,0.08) 100%)" },
           ].map((stat) => (
             <div key={stat.label} className="rounded-xl p-[1px]" style={{ background: stat.gradient }}>
-              <div className="rounded-xl bg-bg-card/95 p-4 h-full">
-                <div className="text-[10px] font-mono text-text-dim uppercase tracking-widest mb-1.5">{stat.label}</div>
-                <div className={`text-2xl font-mono font-black ${stat.color || "text-text-bright"}`}>{stat.value}</div>
+              <div className="rounded-xl p-5 h-full" style={{ background: 'rgba(12,16,32,0.85)', backdropFilter: 'blur(12px)' }}>
+                <div className="text-[10px] font-mono text-text-dim uppercase tracking-widest mb-2">{stat.label}</div>
+                <div className={`text-3xl font-mono font-black ${stat.color || "text-text-bright"}`}>{stat.value}</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Claimable banner */}
+        {/* Claim All banner */}
         {claimable.length > 0 && (
-          <div className="rounded-xl p-[1px] mb-6" style={{ background: 'linear-gradient(90deg, #22C55E 0%, #16A34A 100%)' }}>
-            <div className="rounded-xl bg-bg-card/95 p-4 flex items-center justify-between">
-              <span className="text-up font-bold text-sm">
-                🎉 You have {claimable.length} unclaimed reward{claimable.length > 1 ? "s" : ""}!
+          <div className="rounded-xl p-[1px] mb-8 anim-fade-up anim-delay-2" style={{ background: 'linear-gradient(90deg, #00FF6A 0%, #00CC55 100%)' }}>
+            <div className="rounded-xl p-5 flex items-center justify-between" style={{ background: 'rgba(12,16,32,0.9)' }}>
+              <span className="text-up font-bold text-base font-display">
+                🎉 {claimable.length} unclaimed reward{claimable.length > 1 ? "s" : ""}!
               </span>
-              {claimable.length > 1 && (
-                <button onClick={handleClaimAll} disabled={claimingAll || isPending}
-                  className="px-5 py-2 rounded-lg text-white font-bold text-xs uppercase hover:scale-[1.02] transition-all disabled:opacity-40"
-                  style={{ background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)', boxShadow: '0 0 12px rgba(34,197,94,0.3)' }}>
-                  {claimingAll ? "Claiming..." : "Claim All"}
-                </button>
-              )}
+              <button onClick={handleClaimAll} disabled={claimingAll || isPending}
+                className="px-8 py-3 rounded-xl text-white font-black text-sm uppercase hover:scale-[1.03] transition-all disabled:opacity-40 font-display"
+                style={{
+                  background: 'linear-gradient(135deg, #00FF6A 0%, #00AA44 100%)',
+                  boxShadow: '0 0 20px rgba(0,255,106,0.35)',
+                  letterSpacing: '0.06em',
+                }}>
+                {claimingAll ? "Claiming..." : "Claim All"}
+              </button>
             </div>
           </div>
         )}
 
         {/* Bet list */}
         {loading && history.length === 0 ? (
-          <div className="text-center text-text-dim py-16 font-mono text-sm">Loading...</div>
+          <div className="text-center text-text-dim py-20 font-mono text-sm">Loading...</div>
         ) : history.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-4xl mb-3">📊</div>
-            <p className="text-text-dim font-mono text-sm mb-3">No bets yet</p>
-            <Link to="/" className="text-btc text-sm font-bold hover:underline">Place your first bet →</Link>
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4">📊</div>
+            <p className="text-text-dim font-mono text-sm mb-4">No bets yet</p>
+            <Link to="/" className="text-btc text-sm font-bold font-display hover:underline">Place your first bet →</Link>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 anim-fade-up anim-delay-3">
             {history.map((bet: BetRecord) => {
               const asset = feedToAsset(bet.feed_id);
               const tf = feedToTimeframe(bet.feed_id);
@@ -172,19 +175,20 @@ export default function History() {
               const amountDisplay = (Number(bet.amount) / 1e6).toFixed(2);
               const lockPx = bet.lock_price ? Number(bet.lock_price) / 1e8 : null;
               const closePx = bet.close_price ? Number(bet.close_price) / 1e8 : null;
-              const assetColor = asset === "BTC" ? "#F7931A" : "#8B5CF6";
+
+              const borderGradient = isClaimable
+                ? 'linear-gradient(135deg, rgba(0,255,106,0.5) 0%, rgba(0,255,106,0.15) 100%)'
+                : status.text === "Won"
+                  ? 'linear-gradient(135deg, rgba(0,255,106,0.2) 0%, rgba(0,255,106,0.04) 100%)'
+                  : status.text === "Lost"
+                    ? 'linear-gradient(135deg, rgba(255,59,59,0.15) 0%, rgba(255,59,59,0.03) 100%)'
+                    : 'rgba(255,255,255,0.04)';
 
               return (
                 <div key={`${bet.round_id}-${bet.user}`}
                   className="rounded-xl p-[1px] transition-all hover:scale-[1.005]"
-                  style={{
-                    background: isClaimable
-                      ? 'linear-gradient(135deg, rgba(34,197,94,0.5) 0%, rgba(34,197,94,0.2) 100%)'
-                      : status.text === "Won"
-                        ? 'linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(34,197,94,0.05) 100%)'
-                        : `linear-gradient(135deg, ${assetColor}15 0%, transparent 100%)`
-                  }}>
-                  <div className="rounded-xl bg-bg-card/95 p-4 flex items-center gap-4">
+                  style={{ background: borderGradient }}>
+                  <div className="rounded-xl p-4 flex items-center gap-4" style={{ background: 'rgba(12,16,32,0.85)', backdropFilter: 'blur(12px)' }}>
                     <Icon size={28} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
@@ -205,13 +209,17 @@ export default function History() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className={`text-sm font-bold ${status.color}`}>
+                      <span className={`text-sm font-bold font-display ${status.color}`}>
                         {status.icon} {status.text}
                       </span>
                       {isClaimable && (
                         <button onClick={() => handleClaim(bet.round_id)} disabled={isPending || claimingId === bet.round_id}
-                          className="px-4 py-2 rounded-lg text-white font-bold text-xs uppercase hover:scale-[1.02] transition-all disabled:opacity-40"
-                          style={{ background: 'linear-gradient(135deg, #22C55E 0%, #16A34A 100%)', boxShadow: '0 0 10px rgba(34,197,94,0.3)' }}>
+                          className="px-5 py-2 rounded-lg text-white font-bold text-xs uppercase hover:scale-[1.03] transition-all disabled:opacity-40 font-display"
+                          style={{
+                            background: 'linear-gradient(135deg, #00FF6A 0%, #00AA44 100%)',
+                            boxShadow: '0 0 12px rgba(0,255,106,0.3)',
+                            letterSpacing: '0.04em',
+                          }}>
                           {claimingId === bet.round_id ? "..." : "Claim"}
                         </button>
                       )}
