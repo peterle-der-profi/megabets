@@ -113,6 +113,8 @@ contract MegaBets is UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable, R
     error InvalidPrice();
     error NoReferralEarnings();
     error TooEarlyToSweep();
+    error OracleTimestampTooFar();
+    error ResolveTooLate();
 
     // ─── Initializer ─────────────────────────────────────────────────────
     function initialize(
@@ -240,8 +242,9 @@ contract MegaBets is UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable, R
         Round storage round = rounds[roundId];
         if (round.status != Status.LOCKED) revert RoundNotResolvable();
         if (block.timestamp < round.resolveTime) revert RoundNotResolvable();
+        if (block.timestamp > round.resolveTime + RESOLVE_WINDOW) revert ResolveTooLate();
 
-        int256 price = _getPrice(round.feedId);
+        int256 price = _getResolvePrice(round.feedId, round.resolveTime);
         round.closePrice = price;
 
         if (round.totalUp == 0 || round.totalDown == 0 || price == round.lockPrice) {
@@ -382,6 +385,7 @@ contract MegaBets is UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable, R
         emit RoundOpened(roundId, feedId, lt, lt + rw);
     }
 
+    /// @dev Returns (price, oracleUpdatedAt in seconds). Reverts on stale/invalid.
     function _getPrice(bytes32 feedId) internal view returns (int256) {
         (, int256 answer,, uint256 updatedAt,) = AggregatorV3Interface(feeds[feedId].oracle).latestRoundData();
         if (answer <= 0) revert InvalidPrice();
@@ -392,6 +396,30 @@ contract MegaBets is UUPSUpgradeable, OwnableUpgradeable, PausableUpgradeable, R
         } else {
             age = block.timestamp - updatedAt;
             if (age > 60) revert StalePrice();
+        }
+        return answer;
+    }
+
+    uint256 constant RESOLVE_WINDOW     = 10;        // must resolve within 10s of resolveTime
+    uint256 constant ORACLE_TOLERANCE   = 5_000_000; // oracle timestamp must be within ±5s of resolveTime (microseconds)
+
+    /// @dev Like _getPrice but also validates oracle timestamp is close to targetTime.
+    function _getResolvePrice(bytes32 feedId, uint64 targetTime) internal view returns (int256) {
+        (, int256 answer,, uint256 updatedAt,) = AggregatorV3Interface(feeds[feedId].oracle).latestRoundData();
+        if (answer <= 0) revert InvalidPrice();
+
+        // Convert targetTime to microseconds for comparison (RedStone uses µs timestamps)
+        uint256 targetMicro = uint256(targetTime) * 1e6;
+
+        if (updatedAt > 1e15) {
+            // Microsecond timestamp (RedStone Bolt)
+            // Oracle must be within ±5s of target resolve time
+            if (updatedAt > targetMicro + ORACLE_TOLERANCE) revert OracleTimestampTooFar();
+            if (updatedAt + ORACLE_TOLERANCE < targetMicro) revert OracleTimestampTooFar();
+        } else {
+            // Second timestamp (standard Chainlink)
+            if (updatedAt > targetTime + 5) revert OracleTimestampTooFar();
+            if (updatedAt + 5 < targetTime) revert OracleTimestampTooFar();
         }
         return answer;
     }
