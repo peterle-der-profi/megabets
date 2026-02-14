@@ -316,52 +316,67 @@ function ReferralBar() {
   );
 }
 
-/* ─── MARKETS WITH TIMEFRAME TABS ─── */
+/* ─── MARKETS WITH TIMEFRAME AS HERO ─── */
+const TF_META: Record<Timeframe, { label: string; desc: string; icon: string }> = {
+  "1m": { label: "1 MIN", desc: "Lightning fast", icon: "⚡" },
+  "5m": { label: "5 MIN", desc: "Quick reads", icon: "🔥" },
+  "10m": { label: "10 MIN", desc: "Steady calls", icon: "📊" },
+  "15m": { label: "15 MIN", desc: "Big picture", icon: "🎯" },
+};
+
 function MarketsSection() {
   const [selectedTf, setSelectedTf] = useState<Timeframe>("1m");
-  const markets: { asset: Asset; featured?: boolean }[] = [
-    { asset: "BTC", featured: true },
-    { asset: "ETH" },
-    { asset: "BTC" },
-    { asset: "ETH" },
-  ];
 
   return (
     <div className="mb-8 anim-fade-up anim-delay-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-text-bright font-display">Active Markets</h2>
-        <div className="flex items-center gap-1.5">
-          {TIMEFRAMES.map((tf) => {
-            const active = tf === selectedTf;
-            return (
-              <button
-                key={tf}
-                onClick={() => setSelectedTf(tf)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all font-display ${
-                  active ? "text-white" : "text-text-dim hover:text-text-secondary"
-                }`}
-                style={active ? {
-                  background: 'linear-gradient(135deg, #F7931A 0%, #E91E8B 100%)',
-                  boxShadow: '0 0 16px rgba(247,147,26,0.4)',
-                } : {
-                  background: 'rgba(255,255,255,0.04)',
-                }}
-              >
-                {TIMEFRAME_LABELS[tf]}
-              </button>
-            );
-          })}
-        </div>
+      <h2 className="text-xl font-bold text-text-bright font-display mb-4">Pick Your Speed</h2>
+      
+      {/* Timeframe selector — BIG, prominent cards */}
+      <div className="grid grid-cols-4 gap-2 mb-5">
+        {TIMEFRAMES.map((tf) => {
+          const active = tf === selectedTf;
+          const meta = TF_META[tf];
+          return (
+            <button
+              key={tf}
+              onClick={() => setSelectedTf(tf)}
+              className={`relative rounded-xl p-3 text-left transition-all group ${
+                active ? '' : 'hover:scale-[1.02]'
+              }`}
+              style={active ? {
+                background: 'linear-gradient(135deg, rgba(247,147,26,0.15) 0%, rgba(220,20,120,0.08) 100%)',
+                border: '1px solid rgba(247,147,26,0.3)',
+                boxShadow: '0 0 24px rgba(247,147,26,0.15), inset 0 0 20px rgba(247,147,26,0.05)',
+              } : {
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.04)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">{meta.icon}</span>
+                <span className={`font-display font-bold text-lg tracking-tight ${
+                  active ? 'text-btc' : 'text-text-secondary group-hover:text-text-bright'
+                }`}>
+                  {meta.label}
+                </span>
+              </div>
+              <span className={`text-[10px] font-mono uppercase tracking-wider ${
+                active ? 'text-btc/70' : 'text-text-dim'
+              }`}>
+                {meta.desc}
+              </span>
+              {active && (
+                <div className="absolute -bottom-[1px] left-1/2 -translate-x-1/2 w-8 h-[2px] rounded-full bg-btc" />
+              )}
+            </button>
+          );
+        })}
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {markets.map((m, i) => (
-          <ActiveMarketCard
-            key={`${m.asset}-${selectedTf}-${i}`}
-            asset={m.asset}
-            timeframe={selectedTf}
-            featured={m.featured}
-          />
-        ))}
+
+      {/* Market cards for selected timeframe */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <ActiveMarketCard asset="BTC" timeframe={selectedTf} featured />
+        <ActiveMarketCard asset="ETH" timeframe={selectedTf} />
       </div>
     </div>
   );
@@ -376,7 +391,7 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8 flex-1 w-full">
         {/* Hero headline — staggered reveal */}
         <div className="mb-6 anim-fade-up">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-text-bright tracking-tight leading-[1.05] font-display">
+          <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-text-bright tracking-tight leading-[1.05] font-display">
             60 Seconds. One Call.{" "}
             <span className="text-fire" style={{ fontWeight: 900 }}>
               No Going Back.
